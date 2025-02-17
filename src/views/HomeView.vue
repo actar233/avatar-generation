@@ -166,7 +166,7 @@ const initCanvas = async () => {
       ctx!!.scale(dpr, dpr);
 
       ctx!!.fillStyle = '#ffffff';
-      ctx!!.fillRect(0, 0, 359, 421);
+      ctx!!.fillRect(57, 65, 244, 315);
       ctx!!.fillStyle = '';
 
       withCanvas((avatarCanvas, avatarCtx) => {
