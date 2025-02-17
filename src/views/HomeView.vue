@@ -2,7 +2,7 @@
   <div class="w-[100vw] h-[100vh] flex flex-col justify-center items-center bg-white">
 
     <div v-if="step === 0" class="w-full h-full flex flex-col justify-evenly items-center">
-      <span>永远怀念-图片生成器</span>
+      <span class="text-2xl">永远怀念-图片生成器</span>
       <input ref="imageRef" type="file" @change="onFileChange" accept="image/*" class="hidden"/>
       <div class="mt-2 flex flex-row items-center">
         <button
@@ -23,9 +23,10 @@
             class="bg-blue-500 text-white px-4 py-2 rounded border border-blue-500 hover:bg-blue-600">
           裁剪
         </button>
+        <div class="w-2"/>
         <button
             @click="cancel"
-            class="bg-white text-black px-4 py-2 rounded border border-gray-500 ml-2 hover:bg-gray-100">
+            class="bg-white text-black px-4 py-2 rounded border border-gray-500 hover:bg-gray-100">
           取消
         </button>
       </div>
@@ -52,9 +53,10 @@
               class="bg-blue-500 text-white px-4 py-2 rounded border border-blue-500 hover:bg-blue-600">
             下载
           </button>
+          <div class="w-2"/>
           <button
               @click="cancel"
-              class="bg-white text-black px-4 py-2 rounded border border-gray-500 ml-2 hover:bg-gray-100">
+              class="bg-white text-black px-4 py-2 rounded border border-gray-500 hover:bg-gray-100">
             取消
           </button>
         </div>
@@ -173,8 +175,13 @@ const initCanvas = async () => {
         avatarCanvas.width = 244 * dpr;
         avatarCanvas.height = 315 * dpr;
         avatarCtx!!.scale(dpr, dpr);
-        avatarCtx!!.filter = 'grayscale(100%)';
+        // avatarCtx!!.filter = 'grayscale(100%)';
         avatarCtx!!.drawImage(avatarImage, 0, 0, 244, 315);
+
+        const imageData = avatarCtx.getImageData(0, 0, avatarCanvas.width, avatarCanvas.height);
+        grayScale(imageData.data);
+        avatarCtx.putImageData(imageData, 0, 0);
+
         ctx!!.drawImage(avatarCanvas, 57, 65, 244, 315);
       })
 
@@ -183,9 +190,22 @@ const initCanvas = async () => {
       resultUrl.value = canvas.toDataURL("image/png");
     })
 
-
   } finally {
     isGeneration.value = false;
+  }
+}
+
+// 将图片变灰色
+const grayScale = (data: Uint8ClampedArray) => {
+  // 遍历每个像素，转换为灰度
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];     // 红色通道
+    const g = data[i + 1]; // 绿色通道
+    const b = data[i + 2]; // 蓝色通道
+    // 计算灰度值（加权平均法，更贴近人眼感知）
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    // 设置新的 RGB 值
+    data[i] = data[i + 1] = data[i + 2] = gray;
   }
 }
 
